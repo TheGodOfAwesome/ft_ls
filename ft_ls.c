@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   final_ft_ls.c                                      :+:      :+:    :+:   */
+/*   ft_ls.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:02:08 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/08/25 17:20:38 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,20 @@ static void print_permissions(mode_t mode)
 
 static void print_filetype(mode_t mode)
 {
-	switch (mode & S_IFMT)
-	{
-		case S_IFREG: putchar('-'); break;
-		case S_IFDIR: putchar('d'); break;
-		case S_IFLNK: putchar('l'); break;
-		case S_IFCHR: putchar('c'); break;
-		case S_IFBLK: putchar('b'); break;
-		case S_IFSOCK: putchar('s'); break;
-		case S_IFIFO: putchar('f'); break;
-	}
+	if (mode & S_IFREG) 
+		ft_putchar('-');
+	if (mode & S_IFDIR) 
+		ft_putchar('d');
+	if (mode & S_IFLNK)
+	//	ft_putchar('l');
+	if (mode & S_IFCHR)
+		ft_putchar('c');
+	if (mode & S_IFBLK)
+	//	ft_putchar('b');
+	if (mode & S_IFSOCK)
+	//	ft_putchar('s');
+	if (mode & S_IFIFO)
+		ft_putchar('f');
 }
 
 void print_time(time_t mod_time)
@@ -49,12 +53,13 @@ void print_time(time_t mod_time)
 	t = localtime(&mod_time);
 	const int mod_mon = t->tm_mon;
 	const int mod_yr = 1970 + t->tm_year;
-	const char* format = ((mod_yr == curr_yr) && (mod_mon >= (curr_mon - 6)))
+	const char* format = ((mod_yr == curr_yr) 
+		&& (mod_mon >= (curr_mon - 6)))
 		? "%b %e %H:%M"
 		: "%b %e  %Y";
 	char time_buf[128];
 	strftime(time_buf, sizeof(time_buf), format, t);
-	printf("%s", time_buf);
+	ft_putstr(time_buf);
 }
 
 struct stat get_stats(const char *filename, char *dir)
@@ -79,7 +84,6 @@ static int cmp_time(const void* p1, const void* p2, char *dir)
 
 	time_t time1 = get_stats(str1, dir).st_mtime;
 	time_t time2 = get_stats(str2, dir).st_mtime;
-
 	return time1 < time2;
 }
 
@@ -117,7 +121,9 @@ int     is_in_dir(const char* dir, const char* filename)
 		}
 		dp = readdir(dfd);
 	}
-	printf("file %s not found\n", filename);
+	ft_putstr("file ");
+	ft_putstr(filename);
+	ft_putstr("not found\n");
 	closedir(dfd);
 	return (0);
 }
@@ -133,12 +139,16 @@ void print_name_or_link(const char* filename, char *opts, mode_t mode)
 		if (count >= 0)
 		{
 			link_buf[count] = '\0';
-			printf(" %s -> %s \n", filename, link_buf);
+			ft_putstr(" ");
+			ft_putstr(filename);
+			ft_putstr(" -> ");
+			ft_putstr(link_buf);
+			ft_putstr(" \n");
 			return ;
 		}
 	}
-	printf(" %s", filename);
-	putchar('\n');
+	ft_putstr(filename);
+	ft_putstr("\n");
 }
 
 void display_stats(char* dir, char* filename, char *opts)
@@ -149,17 +159,24 @@ void display_stats(char* dir, char* filename, char *opts)
 		return ;
 	if (!ft_strcmp(opts, "l"))
 	{
-		printf("%s\n", filename);
+		ft_putstr(filename);
+		ft_putstr("\n");
 		return ;
 	}
 	sb = get_stats(filename, dir);
 	print_filetype(sb.st_mode);
 	print_permissions(sb.st_mode);
-	printf(" %d ", sb.st_nlink);
-	printf("%10s ", getpwuid(sb.st_uid)->pw_name);
-	printf("%10s", getgrgid(sb.st_gid)->gr_name);
-	printf("%10ld ", (long)sb.st_size);
+	ft_putstr(" ");
+	ft_putstr(ft_itoa(sb.st_nlink));
+	ft_putstr(" ");
+	ft_putstr(getpwuid(sb.st_uid)->pw_name);
+	ft_putstr(" ");
+	ft_putstr(getgrgid(sb.st_gid)->gr_name);
+	ft_putstr(" ");
+	ft_putstr(ft_itoa((int)sb.st_size));
+	ft_putstr(" ");
 	print_time(sb.st_mtime);
+	ft_putstr(" ");
 	print_name_or_link(filename, opts, sb.st_mode);
 }
 
@@ -207,7 +224,10 @@ void	recurse_dirs(char* dir, char *opts)
 	{
 		omit_hidden = !ft_strcmp(opts, "a");
 		if (!omit_hidden)
-			printf("%s\n", direntry->d_name);
+		{
+			ft_putstr(direntry->d_name);
+			ft_putstr("\n");
+		}
 		if (can_recurse_dir(dir, direntry->d_name))
 		{
 			next = ft_strjoin(dir, "/");
@@ -224,7 +244,9 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 	struct dirent	*dirp;
 
 	count = 0;
-	printf("-------%s-------\n", opts);
+	ft_putstr("-------");
+	ft_putstr(opts);
+	ft_putstr("-------\n");
 	if ((dirp = readdir(dp)) == NULL)
 	{
 		perror("Error: ");
@@ -242,13 +264,14 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 			else
 			{
 				//if(!ft_strcmp(dirp->d_name, "./"))
-				//	display_stats(dir_name, dirp->d_name, opts);//printf("%s:\n", dir_name);
+				//	display_stats(dir_name, dirp->d_name, opts);
+				//	//printf("%s:\n", dir_name);
 				//printf("%s\n", dirp->d_name);
 				display_stats(dir_name, dirp->d_name, opts);
 			}
 		}
 	}
-	printf("\n");
+	recurse_dirs("./", opts);
 	closedir(dp);
 }
 
