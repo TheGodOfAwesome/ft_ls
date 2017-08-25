@@ -1,30 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ls.h                                            :+:      :+:    :+:   */
+/*   ft_memccpy.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/30 22:27:40 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:09:00 by kmuvezwa         ###   ########.fr       */
+/*   Created: 2017/06/11 13:33:10 by kmuvezwa          #+#    #+#             */
+/*   Updated: 2017/06/11 13:34:58 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_LS_H
-# define FT_LS_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <dirent.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <string.h>
-# include <stdio.h>
-# include <libc.h>
-# include <grp.h>
-# include <uuid/uuid.h>
-# include <pwd.h>
-# include "libft/libft.h"
+void	*ft_memccpy(void *dst, void *src, int c, size_t n)
+{
+	size_t			i;
+	unsigned char	*sdst;
+	unsigned char	*ssrc;
+	unsigned char	t;
 
-#endif
-
+	i = 0;
+	sdst = (unsigned char *)dst;
+	ssrc = (unsigned char *)src;
+	t = (unsigned char)c;
+	while (i < n)
+	{
+		sdst[i] = ssrc[i];
+		if (ssrc[i] == t)
+			return (sdst + i + 1);
+		i++;
+	}
+	return (NULL);
+}

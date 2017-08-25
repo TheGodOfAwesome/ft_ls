@@ -1,30 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ls.h                                            :+:      :+:    :+:   */
+/*   ft_strchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/30 22:27:40 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:09:00 by kmuvezwa         ###   ########.fr       */
+/*   Created: 2017/06/11 08:35:50 by kmuvezwa          #+#    #+#             */
+/*   Updated: 2017/06/11 09:01:35 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_LS_H
-# define FT_LS_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <dirent.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <string.h>
-# include <stdio.h>
-# include <libc.h>
-# include <grp.h>
-# include <uuid/uuid.h>
-# include <pwd.h>
-# include "libft/libft.h"
+char	*ft_strchr(const char *s, int c)
+{
+	char	*temp;
 
-#endif
-
+	temp = (char *)s;
+	while (*temp != '\0')
+	{
+		if (*temp == c)
+		{
+			return (temp);
+		}
+		temp++;
+	}
+	if (*temp == c)
+	{
+		return (temp);
+	}
+	return (NULL);
+}

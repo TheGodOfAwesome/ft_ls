@@ -1,30 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ls.h                                            :+:      :+:    :+:   */
+/*   ft_memcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/30 22:27:40 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:09:00 by kmuvezwa         ###   ########.fr       */
+/*   Created: 2017/06/11 13:51:07 by kmuvezwa          #+#    #+#             */
+/*   Updated: 2017/06/11 15:38:36 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_LS_H
-# define FT_LS_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <dirent.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <string.h>
-# include <stdio.h>
-# include <libc.h>
-# include <grp.h>
-# include <uuid/uuid.h>
-# include <pwd.h>
-# include "libft/libft.h"
+int		ft_memcmp(const void *s1, const void *s2, size_t n)
+{
+	size_t				i;
+	const unsigned char	*str1;
+	const unsigned char *str2;
 
-#endif
-
+	i = 0;
+	str1 = (const unsigned char*)s1;
+	str2 = (const unsigned char*)s2;
+	while (i < n)
+	{
+		if (str1[i] != str2[i])
+			return (str1[i] - str2[i]);
+		else
+			i++;
+	}
+	return (0);
+}

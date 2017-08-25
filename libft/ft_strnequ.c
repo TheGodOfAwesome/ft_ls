@@ -1,30 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ls.h                                            :+:      :+:    :+:   */
+/*   ft_strnequ.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/30 22:27:40 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:09:00 by kmuvezwa         ###   ########.fr       */
+/*   Created: 2017/08/13 18:22:38 by kmuvezwa          #+#    #+#             */
+/*   Updated: 2017/08/14 16:50:19 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_LS_H
-# define FT_LS_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <dirent.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <string.h>
-# include <stdio.h>
-# include <libc.h>
-# include <grp.h>
-# include <uuid/uuid.h>
-# include <pwd.h>
-# include "libft/libft.h"
-
-#endif
-
+int	ft_strnequ(char const *s1, char const *s2, size_t n)
+{
+	if (s1 == NULL || s2 == NULL)
+		return (0);
+	if (ft_strncmp(s1, s2, n) == 0)
+		return (1);
+	else
+		return (0);
+}

@@ -1,30 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ls.h                                            :+:      :+:    :+:   */
+/*   ft_memalloc.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/30 22:27:40 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:09:00 by kmuvezwa         ###   ########.fr       */
+/*   Created: 2017/05/24 02:53:44 by kmuvezwa          #+#    #+#             */
+/*   Updated: 2017/08/03 14:58:30 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_LS_H
-# define FT_LS_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <dirent.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <string.h>
-# include <stdio.h>
-# include <libc.h>
-# include <grp.h>
-# include <uuid/uuid.h>
-# include <pwd.h>
-# include "libft/libft.h"
+void	*ft_memalloc(size_t size)
+{
+	void	*memory;
 
-#endif
-
+	memory = malloc(size);
+	if (memory)
+	{
+		ft_bzero(memory, size + 1);
+		return (memory);
+	}
+	return (NULL);
+}

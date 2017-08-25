@@ -1,30 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ls.h                                            :+:      :+:    :+:   */
+/*   ft_strstr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/30 22:27:40 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:09:00 by kmuvezwa         ###   ########.fr       */
+/*   Created: 2017/06/10 10:23:12 by kmuvezwa          #+#    #+#             */
+/*   Updated: 2017/06/11 15:14:53 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_LS_H
-# define FT_LS_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <dirent.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <string.h>
-# include <stdio.h>
-# include <libc.h>
-# include <grp.h>
-# include <uuid/uuid.h>
-# include <pwd.h>
-# include "libft/libft.h"
+char	*ft_strstr(const char *haystack, const char *needle)
+{
+	int i;
+	int index;
+	int len;
 
-#endif
-
+	i = 0;
+	index = 0;
+	len = ft_strlen((char *)needle);
+	if (len == 0)
+		return ((char *)haystack);
+	while (haystack[i])
+	{
+		while (needle[index] == haystack[index + i])
+		{
+			if (index == len - 1)
+				return ((char *)(haystack + i));
+			index++;
+		}
+		index = 0;
+		i++;
+	}
+	return (NULL);
+}

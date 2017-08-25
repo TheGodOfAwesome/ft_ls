@@ -1,30 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ls.h                                            :+:      :+:    :+:   */
+/*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/30 22:27:40 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:09:00 by kmuvezwa         ###   ########.fr       */
+/*   Created: 2017/06/11 01:23:19 by kmuvezwa          #+#    #+#             */
+/*   Updated: 2017/06/11 03:00:32 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_LS_H
-# define FT_LS_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <dirent.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <string.h>
-# include <stdio.h>
-# include <libc.h>
-# include <grp.h>
-# include <uuid/uuid.h>
-# include <pwd.h>
-# include "libft/libft.h"
+char	*ft_strdup(const char *s1)
+{
+	int		i;
+	int		count;
+	char	*temp;
 
-#endif
-
+	i = 0;
+	count = ft_strlen((char *)s1);
+	temp = (char *)malloc(sizeof(char) * (count + 1));
+	if (temp)
+	{
+		while (s1[i] != '\0')
+		{
+			temp[i] = s1[i];
+			i++;
+		}
+		temp[i] = '\0';
+		return ((char *)temp);
+	}
+	return (NULL);
+}

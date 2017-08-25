@@ -1,30 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ls.h                                            :+:      :+:    :+:   */
+/*   ft_memchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/30 22:27:40 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:09:00 by kmuvezwa         ###   ########.fr       */
+/*   Created: 2017/06/07 15:51:19 by kmuvezwa          #+#    #+#             */
+/*   Updated: 2017/06/10 20:27:23 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_LS_H
-# define FT_LS_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <dirent.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <string.h>
-# include <stdio.h>
-# include <libc.h>
-# include <grp.h>
-# include <uuid/uuid.h>
-# include <pwd.h>
-# include "libft/libft.h"
+void	*ft_memchr(const void *s, int c, size_t n)
+{
+	unsigned char	t;
+	unsigned char	*src;
+	size_t			i;
 
-#endif
-
+	i = 0;
+	t = (unsigned char)c;
+	src = (unsigned char *)s;
+	while (i < n)
+	{
+		if (*src == t)
+		{
+			return ((void *)src);
+		}
+		src++;
+		i++;
+	}
+	return (NULL);
+}

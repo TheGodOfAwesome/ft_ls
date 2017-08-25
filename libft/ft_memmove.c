@@ -1,30 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ls.h                                            :+:      :+:    :+:   */
+/*   ft_memmove.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/30 22:27:40 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:09:00 by kmuvezwa         ###   ########.fr       */
+/*   Created: 2017/05/28 00:43:26 by kmuvezwa          #+#    #+#             */
+/*   Updated: 2017/06/11 13:48:52 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_LS_H
-# define FT_LS_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <dirent.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <string.h>
-# include <stdio.h>
-# include <libc.h>
-# include <grp.h>
-# include <uuid/uuid.h>
-# include <pwd.h>
-# include "libft/libft.h"
+void	*ft_memmove(void *dest, const void *src, size_t len)
+{
+	size_t	i;
 
-#endif
-
+	i = 0;
+	if (src < dest)
+	{
+		i = len;
+		while (i > 0)
+		{
+			i--;
+			((char *)dest)[i] = ((char *)src)[i];
+		}
+	}
+	else
+	{
+		while (i < len)
+		{
+			((char *)dest)[i] = ((char *)src)[i];
+			i++;
+		}
+	}
+	return ((void *)dest);
+}

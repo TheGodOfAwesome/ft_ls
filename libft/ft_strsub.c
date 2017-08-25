@@ -1,30 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ls.h                                            :+:      :+:    :+:   */
+/*   ft_strsub.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/30 22:27:40 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 16:09:00 by kmuvezwa         ###   ########.fr       */
+/*   Created: 2017/06/09 10:55:32 by kmuvezwa          #+#    #+#             */
+/*   Updated: 2017/08/04 16:38:08 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_LS_H
-# define FT_LS_H
+#include "libft.h"
 
-# include <unistd.h>
-# include <dirent.h>
-# include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <string.h>
-# include <stdio.h>
-# include <libc.h>
-# include <grp.h>
-# include <uuid/uuid.h>
-# include <pwd.h>
-# include "libft/libft.h"
+char	*ft_strsub(char const *s, unsigned int start, size_t len)
+{
+	char	*substr;
+	char	*str;
 
-#endif
-
+	substr = ft_strnew(len);
+	if (!substr)
+		return (NULL);
+	if (!s)
+		return (NULL);
+	str = (char*)s;
+	if (ft_strlen(str) >= (int)(start + len))
+	{
+		str = str + start;
+		ft_strncpy(substr, str, len);
+	}
+	return (substr);
+}
