@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/25 17:20:38 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/08/26 14:12:33 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ struct stat get_stats(const char *filename, char *dir)
 	return sb;
 }
 
-static int cmp_time(const void* p1, const void* p2, char *dir)
+/*static int cmp_time(const void* p1, const void* p2, char *dir)
 {
 	const char* str1 = *(const char**)p1;
 	const char* str2 = *(const char**)p2;
@@ -85,7 +85,7 @@ static int cmp_time(const void* p1, const void* p2, char *dir)
 	time_t time1 = get_stats(str1, dir).st_mtime;
 	time_t time2 = get_stats(str2, dir).st_mtime;
 	return time1 < time2;
-}
+}*/
 
 int     is_dir(const char* filename, char *dir)
 {
@@ -130,9 +130,11 @@ int     is_in_dir(const char* dir, const char* filename)
 
 void print_name_or_link(const char* filename, char *opts, mode_t mode)
 {
+	char	*temp;
 	char    link_buf[512];
 	int     count;
 
+	temp = opts;
 	if (mode & S_IFLNK)
 	{
 		count = readlink(filename, link_buf, sizeof(link_buf));
@@ -271,7 +273,7 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 			}
 		}
 	}
-	recurse_dirs("./", opts);
+	recurse_dirs("../", opts);
 	closedir(dp);
 }
 
@@ -324,7 +326,8 @@ int		main(int argc, char **argv)
 	{
 		while (x < argc)
 		{
-			opts = (argv[x][0] == '-') ? ft_strjoin(opts, argv[x]) : ft_strjoin(opts, "");
+			opts = (argv[x][0] == '-') ? 
+				ft_strjoin(opts, argv[x]) : ft_strjoin(opts, "");
 			(argv[x][0] != '-') ?  check_usage(argv[x], opts) : "./";
 			x++;
 		}
