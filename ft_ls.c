@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/26 14:12:33 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/08/27 16:59:44 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,15 @@ static void print_filetype(mode_t mode)
 	if (mode & S_IFDIR) 
 		ft_putchar('d');
 	if (mode & S_IFLNK)
-	//	ft_putchar('l');
-	if (mode & S_IFCHR)
-		ft_putchar('c');
+		//	ft_putchar('l');
+		if (mode & S_IFCHR)
+			ft_putchar('c');
 	if (mode & S_IFBLK)
-	//	ft_putchar('b');
-	if (mode & S_IFSOCK)
-	//	ft_putchar('s');
-	if (mode & S_IFIFO)
-		ft_putchar('f');
+		//	ft_putchar('b');
+		if (mode & S_IFSOCK)
+			//	ft_putchar('s');
+			if (mode & S_IFIFO)
+				ft_putchar('f');
 }
 
 void print_time(time_t mod_time)
@@ -54,7 +54,7 @@ void print_time(time_t mod_time)
 	const int mod_mon = t->tm_mon;
 	const int mod_yr = 1970 + t->tm_year;
 	const char* format = ((mod_yr == curr_yr) 
-		&& (mod_mon >= (curr_mon - 6)))
+			&& (mod_mon >= (curr_mon - 6)))
 		? "%b %e %H:%M"
 		: "%b %e  %Y";
 	char time_buf[128];
@@ -78,14 +78,14 @@ struct stat get_stats(const char *filename, char *dir)
 }
 
 /*static int cmp_time(const void* p1, const void* p2, char *dir)
-{
-	const char* str1 = *(const char**)p1;
-	const char* str2 = *(const char**)p2;
+  {
+  const char* str1 = *(const char**)p1;
+  const char* str2 = *(const char**)p2;
 
-	time_t time1 = get_stats(str1, dir).st_mtime;
-	time_t time2 = get_stats(str2, dir).st_mtime;
-	return time1 < time2;
-}*/
+  time_t time1 = get_stats(str1, dir).st_mtime;
+  time_t time2 = get_stats(str2, dir).st_mtime;
+  return time1 < time2;
+  }*/
 
 int     is_dir(const char* filename, char *dir)
 {
@@ -198,10 +198,8 @@ int		can_recurse_dir(char* parent, char* curr)
 	static char *path;
 	struct stat sb;
 
-	if (!ft_strcmp(".", curr) || !ft_strcmp("..", curr))
-	{
+	if (!ft_strcmp(".", curr) || !ft_strcmp("..", curr))	
 		return (0);
-	}
 	path = ft_strjoin(parent, "/");
 	path = ft_strjoin(path, curr);
 	if (lstat(path, &sb) < 0)
@@ -212,29 +210,65 @@ int		can_recurse_dir(char* parent, char* curr)
 	return S_ISDIR(sb.st_mode);
 }
 
-void	recurse_dirs(char* dir, char *opts)
+void    count_files(char *dir_count, char *opts, int check, int file_count)
+{
+	char            *next;
+	DIR             *dfd_count;
+	struct dirent   *direntry_count;
+	int				omit_hidden;
+
+	file_count = 0;
+	dfd_count = opendir(dir_count);
+	direntry_count = readdir(dfd_count);
+	while ((direntry_count = readdir(dfd_count)) && check)
+	{
+		if (direntry_count->d_type == DT_REG)
+			file_count++;
+		if (can_recurse_dir(dir_count, direntry_count->d_name))
+		{
+			next = ft_strjoin(dir_count, "/");
+			next = ft_strjoin(next, direntry_count->d_name);
+			count_files(next, opts, check, file_count);
+		}
+		check = 0;
+	}
+	closedir(dfd_count);
+	ft_putstr("total ");
+	ft_putstr(ft_itoa(file_count));
+	ft_putstr("\n");
+}
+
+void	recurse_dirs(char *dir, char *opts, int check)
 {
 	char			*next;
 	DIR				*dfd;
 	struct dirent	*direntry;
 	int 			omit_hidden;
 
+	if (check)
+	{
+		count_files(dir, opts, 1, 0);
+		check = 0;
+	}
 	dfd = opendir(dir);
 	direntry = readdir(dfd);
-	printf("\n%s:\n", dir);
+	ft_putstr("\n");
+	ft_putstr(dir);
+	ft_putstr("\n");
 	while ((direntry = readdir(dfd)))
 	{
 		omit_hidden = !ft_strcmp(opts, "a");
 		if (!omit_hidden)
 		{
-			ft_putstr(direntry->d_name);
-			ft_putstr("\n");
+			//ft_putstr(direntry->d_name);
+			display_stats(dir, direntry->d_name, opts);
+			//ft_putstr("\n");
 		}
 		if (can_recurse_dir(dir, direntry->d_name))
 		{
 			next = ft_strjoin(dir, "/");
 			next = ft_strjoin(next, direntry->d_name);
-			recurse_dirs(next, opts);
+			recurse_dirs(next, opts, check);
 		}
 	}
 	closedir(dfd);
@@ -261,7 +295,7 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 			//if (!ft_strcmp(dirp->d_name, ".") || !ft_strcmp(dirp->d_name, ".."))
 			//(dirp->d_name[0] == ft_strchr(dirp->d_name, int c));
 			//if (ft_strcmp(dirp->d_name[0], ".") && ft_strcmp(opts, "a"))
-			if ((dirp->d_name[0] == '.') && ft_strcmp(opts, "a"))
+			if ((dirp->d_name[0] == 'x') && ft_strcmp(opts, "a"))
 				count++;
 			else
 			{
@@ -273,7 +307,7 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 			}
 		}
 	}
-	recurse_dirs("../", opts);
+	recurse_dirs(".", opts, 0);
 	closedir(dp);
 }
 
