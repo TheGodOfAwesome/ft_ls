@@ -6,13 +6,13 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/07 14:55:11 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/07 18:26:01 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-static void print_permissions(mode_t mode)
+void	print_permissions(mode_t mode)
 {
 	ft_putchar((mode & S_IRUSR) ? 'r' : '-');
 	ft_putchar((mode & S_IWUSR) ? 'w' : '-');
@@ -25,7 +25,7 @@ static void print_permissions(mode_t mode)
 	ft_putchar((mode & S_IXOTH) ? 'x' : '-');
 }
 
-static void print_filetype(mode_t mode)
+void	print_filetype(mode_t mode)
 {
 	if (mode & S_IFREG) 
 		ft_putchar('-');
@@ -43,7 +43,7 @@ static void print_filetype(mode_t mode)
 		ft_putchar('f');
 }
 
-void print_time(time_t mod_time)
+void	print_time(time_t mod_time)
 {
 	time_t curr_time;
 	time(&curr_time);
@@ -77,7 +77,7 @@ struct stat get_stats(const char *filename, char *dir)
 	return sb;
 }
 
-/*static int cmp_time(const void* p1, const void* p2, char *dir)
+/*int cmp_time(const void* p1, const void* p2, char *dir)
   {
   const char* str1 = *(const char**)p1;
   const char* str2 = *(const char**)p2;
@@ -363,7 +363,10 @@ int		main(int argc, char **argv)
 				ft_strjoin(opts, argv[x]) : ft_strjoin(opts, "");
 		x = 0;
 		while (x++ < argc - 1)
+		{
 			(argv[x][0] != '-') ?  check_usage(argv[x], opts) : "./";
+			(x != argc - 2) ?  ft_putstr("\n") : ft_putstr("");
+		}
 	}
 	return (0);
 }
