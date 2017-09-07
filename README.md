@@ -6,7 +6,7 @@
 #    By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/08/25 08:59:46 by kmuvezwa          #+#    #+#              #
-#    Updated: 2017/08/25 09:01:50 by kmuvezwa         ###   ########.fr        #
+#    Updated: 2017/09/07 13:34:52 by kmuvezwa         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,3 +17,6 @@ It deals with
 	• Management of ACL and extended attributes. 
 	• Management of the columns without the option -l. (man 4 tty) 
 	• Management of options -u, -f, -g, -d, ...
+
+To compile:
+	gcc -Werror -Wextra -Wall ft_ls.c -o test -L ./libft -lft

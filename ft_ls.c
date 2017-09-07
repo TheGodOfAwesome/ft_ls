@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/08/27 16:59:44 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/07 14:55:11 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,15 @@ static void print_filetype(mode_t mode)
 	if (mode & S_IFDIR) 
 		ft_putchar('d');
 	if (mode & S_IFLNK)
-		//	ft_putchar('l');
-		if (mode & S_IFCHR)
-			ft_putchar('c');
+		ft_putchar('l');
+	if (mode & S_IFCHR)
+		ft_putchar('c');
 	if (mode & S_IFBLK)
-		//	ft_putchar('b');
-		if (mode & S_IFSOCK)
-			//	ft_putchar('s');
-			if (mode & S_IFIFO)
-				ft_putchar('f');
+		ft_putchar('b');
+	if (mode & S_IFSOCK)
+		ft_putchar('s');
+	if (mode & S_IFIFO)
+		ft_putchar('f');
 }
 
 void print_time(time_t mod_time)
@@ -215,8 +215,7 @@ void    count_files(char *dir_count, char *opts, int check, int file_count)
 	char            *next;
 	DIR             *dfd_count;
 	struct dirent   *direntry_count;
-	int				omit_hidden;
-
+	
 	file_count = 0;
 	dfd_count = opendir(dir_count);
 	direntry_count = readdir(dfd_count);
@@ -295,19 +294,21 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 			//if (!ft_strcmp(dirp->d_name, ".") || !ft_strcmp(dirp->d_name, ".."))
 			//(dirp->d_name[0] == ft_strchr(dirp->d_name, int c));
 			//if (ft_strcmp(dirp->d_name[0], ".") && ft_strcmp(opts, "a"))
+			if (ft_strcmp(dir_name,"exacalibur"))
+				count = 0;
 			if ((dirp->d_name[0] == 'x') && ft_strcmp(opts, "a"))
 				count++;
 			else
 			{
 				//if(!ft_strcmp(dirp->d_name, "./"))
 				//	display_stats(dir_name, dirp->d_name, opts);
-				//	//printf("%s:\n", dir_name);
-				//printf("%s\n", dirp->d_name);
-				display_stats(dir_name, dirp->d_name, opts);
+				//printf("%s:\n", dir_name);
+				printf("%s\n", dirp->d_name);
+				//display_stats(dir_name, dirp->d_name, opts);
 			}
 		}
 	}
-	recurse_dirs(".", opts, 0);
+	//recurse_dirs(".", opts, 0);
 	closedir(dp);
 }
 
@@ -323,21 +324,20 @@ void    check_usage(char *dirs, char *opts)
 	{
 		if(!ft_strchr(flags, *test) && *test != '-')
 		{
-			printf("ls: illegal option -- %c\nusage: ls [%s] [file ...]\n", *test, flags);
+			printf("ls: illegal option -- %c\nusage: ls [%s] [file ...]\n", 
+					*test, flags);
 			exit(0);
 		}
 		test++;
 	}
 	if ((dp = opendir(dirs)) == NULL)
-	{
 		printf("ft_ls: %s:  No such file or directory\n", dirs);
-		return ;
-	}
 	else
 	{
 		printf("%s:\n", dirs);
 		print_dirs(dp, opts, dirs);
 	}
+	return ;
 }
 
 int		main(int argc, char **argv)
@@ -347,7 +347,7 @@ int		main(int argc, char **argv)
 	int				x;
 
 	opts = "";
-	x = 1;
+	x = 0;
 	if (argc == 1)
 		check_usage("./", opts);
 	else if (argc == 2)
@@ -358,13 +358,12 @@ int		main(int argc, char **argv)
 	}
 	else if (argc >= 2)
 	{
-		while (x < argc)
-		{
+		while (x++ < argc - 1)
 			opts = (argv[x][0] == '-') ? 
 				ft_strjoin(opts, argv[x]) : ft_strjoin(opts, "");
+		x = 0;
+		while (x++ < argc - 1)
 			(argv[x][0] != '-') ?  check_usage(argv[x], opts) : "./";
-			x++;
-		}
 	}
 	return (0);
 }
