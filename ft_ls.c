@@ -6,10 +6,11 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/07 18:26:01 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/09 09:29:39 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <string.h>
 #include "ft_ls.h"
 
 void	print_permissions(mode_t mode)
@@ -215,7 +216,7 @@ void    count_files(char *dir_count, char *opts, int check, int file_count)
 	char            *next;
 	DIR             *dfd_count;
 	struct dirent   *direntry_count;
-	
+
 	file_count = 0;
 	dfd_count = opendir(dir_count);
 	direntry_count = readdir(dfd_count);
@@ -303,13 +304,55 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 				//if(!ft_strcmp(dirp->d_name, "./"))
 				//	display_stats(dir_name, dirp->d_name, opts);
 				//printf("%s:\n", dir_name);
-				printf("%s\n", dirp->d_name);
+				ft_putstr(dirp->d_name);
+				ft_putstr("\n");
 				//display_stats(dir_name, dirp->d_name, opts);
 			}
 		}
 	}
 	//recurse_dirs(".", opts, 0);
 	closedir(dp);
+}
+
+char	*ft_strjoins(char *s1, char *s2)
+{
+	char	*str;
+	int		i;
+	int		len1;
+	int		len2;
+
+	i = 0;
+	len1 = ft_strlen(s1);
+	len2 = ft_strlen(s2);
+	str = (char*)malloc((sizeof(char) * len1 + len2) + 1);
+	if (s1 && s2 && str)
+	{
+		while (i < len1)
+		{
+			str[i] = *s1++;
+			i++;
+		}
+		while (i < len1 + len2)
+		{
+			str[i] = *s2++;
+			i++;
+		}
+		str[i] = '\0';
+	}
+	return (str);
+}
+
+void	print_error(int condition, char *info, char *infos)
+{
+	if(condition == 1)
+	{
+		printf("ft_ls: illegal option -- %c\nusage: ft_ls [%s] [file ...]\n",
+				*info, infos);
+	}
+	if(condition == 2)
+	{
+		printf("ft_ls: %s:  No such file or directory\n", info);
+	}
 }
 
 void    check_usage(char *dirs, char *opts)
@@ -320,53 +363,50 @@ void    check_usage(char *dirs, char *opts)
 
 	flags = "ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1";
 	test = opts;
+	printf("dirs: %s\n", dirs);
 	while (*test != '\0')
 	{
 		if(!ft_strchr(flags, *test) && *test != '-')
 		{
-			printf("ls: illegal option -- %c\nusage: ls [%s] [file ...]\n", 
-					*test, flags);
+			print_error(1, test, flags);
 			exit(0);
 		}
 		test++;
 	}
 	if ((dp = opendir(dirs)) == NULL)
-		printf("ft_ls: %s:  No such file or directory\n", dirs);
+		print_error(2, dirs, "");
 	else
 	{
-		printf("%s:\n", dirs);
+		ft_putstr(dirs);
+		ft_putstr(":\n");
 		print_dirs(dp, opts, dirs);
 	}
 	return ;
 }
 
-int		main(int argc, char **argv)
+int		main(int ac, char **av)
 {
-	char            *dirs;
-	char			*opts;
-	int				x;
+	char	*opts;
+	int		x;
 
 	opts = "";
-	x = 0;
-	if (argc == 1)
+	x = 1;
+	if (ac == 1)
 		check_usage("./", opts);
-	else if (argc == 2)
+	else if (ac == 2)
+		check_usage(((av[x][0] != '-') ? av[x] : "./"), ((av[x][0] == '-') 
+					? av[x] : ""));
+	else if (ac >= 2)
 	{
-		opts = (argv[x][0] == '-') ? argv[x] : "";
-		dirs = (argv[x][0] != '-') ? argv[x] : "./";
-		check_usage(dirs, opts);
-	}
-	else if (argc >= 2)
-	{
-		while (x++ < argc - 1)
-			opts = (argv[x][0] == '-') ? 
-				ft_strjoin(opts, argv[x]) : ft_strjoin(opts, "");
-		x = 0;
-		while (x++ < argc - 1)
+		while (x++ < ac - 1)
+			!(av[x][0] == '-') ? ft_strjoins(opts, av[x]) : ft_strjoins(opts, av[x]);
+		x = 1;
+		while (x++ < ac - 1)
 		{
-			(argv[x][0] != '-') ?  check_usage(argv[x], opts) : "./";
-			(x != argc - 2) ?  ft_putstr("\n") : ft_putstr("");
+			((av[x][0] != '-') && x > 2) ? ft_putstr("\n") : ft_putstr("");
+			(av[x][0] != '-') ? check_usage(av[x], opts) : ft_strjoins(opts, av[x]);
 		}
+		printf("opts: %s\n", opts);
 	}
 	return (0);
 }
