@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/09 09:29:39 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/09 23:57:56 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -314,34 +314,6 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 	closedir(dp);
 }
 
-char	*ft_strjoins(char *s1, char *s2)
-{
-	char	*str;
-	int		i;
-	int		len1;
-	int		len2;
-
-	i = 0;
-	len1 = ft_strlen(s1);
-	len2 = ft_strlen(s2);
-	str = (char*)malloc((sizeof(char) * len1 + len2) + 1);
-	if (s1 && s2 && str)
-	{
-		while (i < len1)
-		{
-			str[i] = *s1++;
-			i++;
-		}
-		while (i < len1 + len2)
-		{
-			str[i] = *s2++;
-			i++;
-		}
-		str[i] = '\0';
-	}
-	return (str);
-}
-
 void	print_error(int condition, char *info, char *infos)
 {
 	if(condition == 1)
@@ -363,7 +335,6 @@ void    check_usage(char *dirs, char *opts)
 
 	flags = "ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1";
 	test = opts;
-	printf("dirs: %s\n", dirs);
 	while (*test != '\0')
 	{
 		if(!ft_strchr(flags, *test) && *test != '-')
@@ -387,26 +358,28 @@ void    check_usage(char *dirs, char *opts)
 int		main(int ac, char **av)
 {
 	char	*opts;
+	int		i;
 	int		x;
 
 	opts = "";
-	x = 1;
+	i = 1;
+	x = 0;
 	if (ac == 1)
 		check_usage("./", opts);
 	else if (ac == 2)
-		check_usage(((av[x][0] != '-') ? av[x] : "./"), ((av[x][0] == '-') 
-					? av[x] : ""));
+		check_usage(((av[1][0] == '-') ? "./" : (av[1])), 
+				((av[1][0] == '-') ? av[1] : ""));
 	else if (ac >= 2)
 	{
 		while (x++ < ac - 1)
-			!(av[x][0] == '-') ? ft_strjoins(opts, av[x]) : ft_strjoins(opts, av[x]);
-		x = 1;
+			opts = (av[x][0] == '-') ? ft_strjoin(opts, av[x]) : opts;
+		x = 0;
 		while (x++ < ac - 1)
 		{
-			((av[x][0] != '-') && x > 2) ? ft_putstr("\n") : ft_putstr("");
-			(av[x][0] != '-') ? check_usage(av[x], opts) : ft_strjoins(opts, av[x]);
+			((av[x][0] != '-') && x > 1 && i != x) ? ft_putstr("\n") : "";
+			(av[x][0] != '-') ? check_usage(av[x], opts) : i++;
 		}
-		printf("opts: %s\n", opts);
+		( i == x) ?  check_usage("./", opts) : "i++";
 	}
 	return (0);
 }
