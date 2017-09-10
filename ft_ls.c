@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/09 23:57:56 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/10 06:23:02 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,31 +211,52 @@ int		can_recurse_dir(char* parent, char* curr)
 	return S_ISDIR(sb.st_mode);
 }
 
-void    count_files(char *dir_count, char *opts, int check, int file_count)
-{
-	char            *next;
-	DIR             *dfd_count;
-	struct dirent   *direntry_count;
+/*void    count_files(char *dir_count, char *opts, int check, int file_count)
+  {
+  char            *next;
+  DIR             *dfd_count;
+  struct dirent   *direntry_count;
 
-	file_count = 0;
-	dfd_count = opendir(dir_count);
-	direntry_count = readdir(dfd_count);
-	while ((direntry_count = readdir(dfd_count)) && check)
+  file_count = 0;
+  dfd_count = opendir(dir_count);
+  direntry_count = readdir(dfd_count);
+  while ((direntry_count = readdir(dfd_count)) && check)
+  {
+  if (direntry_count->d_type == DT_REG)
+  file_count++;
+  if (can_recurse_dir(dir_count, direntry_count->d_name))
+  {
+  next = ft_strjoin(dir_count, "/");
+  next = ft_strjoin(next, direntry_count->d_name);
+  count_files(next, opts, check, file_count);
+  }
+  check = 0;
+  }
+  closedir(dfd_count);
+  ft_putstr("total ");
+  ft_putstr(ft_itoa(file_count));
+  ft_putstr("\n");
+  }*/
+
+int		count_files(char *dirs)
+{
+	DIR				*dp;
+	int				count;
+	struct dirent	*dirp;
+
+	count = 0;
+	dp = opendir(dirs);
+	if ((dirp = readdir(dp)) == NULL)
 	{
-		if (direntry_count->d_type == DT_REG)
-			file_count++;
-		if (can_recurse_dir(dir_count, direntry_count->d_name))
-		{
-			next = ft_strjoin(dir_count, "/");
-			next = ft_strjoin(next, direntry_count->d_name);
-			count_files(next, opts, check, file_count);
-		}
-		check = 0;
+		perror("Error: ");
+		return (0);
 	}
-	closedir(dfd_count);
-	ft_putstr("total ");
-	ft_putstr(ft_itoa(file_count));
-	ft_putstr("\n");
+	while ((dirp = readdir(dp)) != NULL)
+	{
+		count++;
+	}
+	closedir(dp);
+	return (count);
 }
 
 void	recurse_dirs(char *dir, char *opts, int check)
@@ -247,7 +268,7 @@ void	recurse_dirs(char *dir, char *opts, int check)
 
 	if (check)
 	{
-		count_files(dir, opts, 1, 0);
+		//count_files(dir, opts, 1, 0);
 		check = 0;
 	}
 	dfd = opendir(dir);
@@ -283,6 +304,7 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 	ft_putstr("-------");
 	ft_putstr(opts);
 	ft_putstr("-------\n");
+	count = count_files(dir_name);
 	if ((dirp = readdir(dp)) == NULL)
 	{
 		perror("Error: ");
@@ -290,6 +312,7 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 	}
 	else
 	{
+		ft_putendl(ft_itoa(count));
 		while ((dirp = readdir(dp)) != NULL)
 		{
 			//if (!ft_strcmp(dirp->d_name, ".") || !ft_strcmp(dirp->d_name, ".."))
@@ -297,17 +320,17 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 			//if (ft_strcmp(dirp->d_name[0], ".") && ft_strcmp(opts, "a"))
 			if (ft_strcmp(dir_name,"exacalibur"))
 				count = 0;
-			if ((dirp->d_name[0] == 'x') && ft_strcmp(opts, "a"))
-				count++;
-			else
-			{
+			//if ((dirp->d_name[0] == 'x') && ft_strcmp(opts, "a"))
+			//	count++;
+			//else
+			//{
 				//if(!ft_strcmp(dirp->d_name, "./"))
 				//	display_stats(dir_name, dirp->d_name, opts);
 				//printf("%s:\n", dir_name);
 				ft_putstr(dirp->d_name);
 				ft_putstr("\n");
 				//display_stats(dir_name, dirp->d_name, opts);
-			}
+			//}
 		}
 	}
 	//recurse_dirs(".", opts, 0);
@@ -379,7 +402,7 @@ int		main(int ac, char **av)
 			((av[x][0] != '-') && x > 1 && i != x) ? ft_putstr("\n") : "";
 			(av[x][0] != '-') ? check_usage(av[x], opts) : i++;
 		}
-		( i == x) ?  check_usage("./", opts) : "i++";
+		(i == x) ?  check_usage("./", opts) : "i++";
 	}
 	return (0);
 }
