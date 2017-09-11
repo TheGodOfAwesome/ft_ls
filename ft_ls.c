@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/10 06:23:02 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/11 18:20:15 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,9 +241,11 @@ int		can_recurse_dir(char* parent, char* curr)
 int		count_files(char *dirs)
 {
 	DIR				*dp;
+	int				max_l;
 	int				count;
 	struct dirent	*dirp;
 
+	max_l = 0;
 	count = 0;
 	dp = opendir(dirs);
 	if ((dirp = readdir(dp)) == NULL)
@@ -253,6 +255,9 @@ int		count_files(char *dirs)
 	}
 	while ((dirp = readdir(dp)) != NULL)
 	{
+		max_l = (ft_strlen(dirp->d_name) > max_l) 
+			? ft_strlen(dirp->d_name) : max_l;
+		ft_putendl(ft_itoa(max_l));
 		count++;
 	}
 	closedir(dp);
