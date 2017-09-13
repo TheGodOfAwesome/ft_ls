@@ -6,13 +6,13 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/13 11:52:15 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/13 11:53:54 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/13 13:11:41 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	ft_count_int_len(int num, int base)
+int	ft_intlen(int num, int base)
 {
 	int		i;
 

@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/13 11:42:19 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/13 13:32:15 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,12 +214,11 @@ int		can_recurse_dir(char* parent, char* curr)
 int		count_files(char *dirs)
 {
 	DIR				*dp;
-	int				max_l;
 	int				count;
+	static int		max[6];
 	struct dirent	*dirp;
 	struct stat     sb;
 
-	max_l = 0;
 	count = 0;
 	dp = opendir(dirs);
 	if ((dirp = readdir(dp)) == NULL)
@@ -229,24 +228,23 @@ int		count_files(char *dirs)
 	}
 	while ((dirp = readdir(dp)) != NULL)
 	{
-		max_l = (ft_strlen(dirp->d_name) > max_l) 
-			? ft_strlen(dirp->d_name) : max_l;
-		ft_putendl(ft_itoa(max_l));
-		/**************************/
+		max[0] = (ft_strlen(dirp->d_name) > max[0]) 
+			? ft_strlen(dirp->d_name) : max[0];
+		ft_putendl(ft_itoa(max[0]));
 		sb = get_stats(dirp->d_name, dirs);
-		print_filetype(sb.st_mode);
-		print_permissions(sb.st_mode);
-		ft_putstr(ft_itoa(sb.st_nlink));
-		ft_putstr(getpwuid(sb.st_uid)->pw_name);
-		ft_putstr(getgrgid(sb.st_gid)->gr_name);
-		ft_putstr(ft_itoa((int)sb.st_size));
-		print_time(sb.st_mtime);
-		print_name_or_link(dirp->d_name, "", sb.st_mode);
-		/***************************/
+		max[1] = (ft_intlen(sb.st_nlink, 10) > max[1]) 
+			? ft_intlen(sb.st_nlink, 10) : max[1];
+		max[2] = (ft_strlen(getpwuid(sb.st_uid)->pw_name) > max[2])
+			? ft_strlen(getpwuid(sb.st_uid)->pw_name) : max[2];
+		max[3] = (ft_strlen(getgrgid(sb.st_gid)->gr_name) > max[3])
+			? ft_strlen(getgrgid(sb.st_gid)->gr_name) : max[3];
+		max[4] = (ft_intlen((int)sb.st_size, 10) > max[4])
+			? ft_intlen((int)sb.st_size, 10) : max[4];
 		count++;
 	}
+	max[5] = count;
 	closedir(dp);
-	return (count);
+	return (max[1]);
 }
 
 void	recurse_dirs(char *dir, char *opts, int check)
