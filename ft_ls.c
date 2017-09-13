@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/11 18:20:15 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/13 11:42:19 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,39 +211,13 @@ int		can_recurse_dir(char* parent, char* curr)
 	return S_ISDIR(sb.st_mode);
 }
 
-/*void    count_files(char *dir_count, char *opts, int check, int file_count)
-  {
-  char            *next;
-  DIR             *dfd_count;
-  struct dirent   *direntry_count;
-
-  file_count = 0;
-  dfd_count = opendir(dir_count);
-  direntry_count = readdir(dfd_count);
-  while ((direntry_count = readdir(dfd_count)) && check)
-  {
-  if (direntry_count->d_type == DT_REG)
-  file_count++;
-  if (can_recurse_dir(dir_count, direntry_count->d_name))
-  {
-  next = ft_strjoin(dir_count, "/");
-  next = ft_strjoin(next, direntry_count->d_name);
-  count_files(next, opts, check, file_count);
-  }
-  check = 0;
-  }
-  closedir(dfd_count);
-  ft_putstr("total ");
-  ft_putstr(ft_itoa(file_count));
-  ft_putstr("\n");
-  }*/
-
 int		count_files(char *dirs)
 {
 	DIR				*dp;
 	int				max_l;
 	int				count;
 	struct dirent	*dirp;
+	struct stat     sb;
 
 	max_l = 0;
 	count = 0;
@@ -258,6 +232,17 @@ int		count_files(char *dirs)
 		max_l = (ft_strlen(dirp->d_name) > max_l) 
 			? ft_strlen(dirp->d_name) : max_l;
 		ft_putendl(ft_itoa(max_l));
+		/**************************/
+		sb = get_stats(dirp->d_name, dirs);
+		print_filetype(sb.st_mode);
+		print_permissions(sb.st_mode);
+		ft_putstr(ft_itoa(sb.st_nlink));
+		ft_putstr(getpwuid(sb.st_uid)->pw_name);
+		ft_putstr(getgrgid(sb.st_gid)->gr_name);
+		ft_putstr(ft_itoa((int)sb.st_size));
+		print_time(sb.st_mtime);
+		print_name_or_link(dirp->d_name, "", sb.st_mode);
+		/***************************/
 		count++;
 	}
 	closedir(dp);
@@ -329,12 +314,12 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 			//	count++;
 			//else
 			//{
-				//if(!ft_strcmp(dirp->d_name, "./"))
-				//	display_stats(dir_name, dirp->d_name, opts);
-				//printf("%s:\n", dir_name);
-				ft_putstr(dirp->d_name);
-				ft_putstr("\n");
-				//display_stats(dir_name, dirp->d_name, opts);
+			//if(!ft_strcmp(dirp->d_name, "./"))
+			//	display_stats(dir_name, dirp->d_name, opts);
+			//printf("%s:\n", dir_name);
+			ft_putstr(dirp->d_name);
+			ft_putstr("\n");
+			//display_stats(dir_name, dirp->d_name, opts);
 			//}
 		}
 	}
