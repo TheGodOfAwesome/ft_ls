@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/13 13:32:15 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/13 18:55:50 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ void	print_time(time_t mod_time)
 	char time_buf[128];
 	strftime(time_buf, sizeof(time_buf), format, t);
 	ft_putstr(time_buf);
+	ft_putchar(' ');
 }
 
 struct stat get_stats(const char *filename, char *dir)
@@ -76,6 +77,36 @@ struct stat get_stats(const char *filename, char *dir)
 		exit(0);
 	}
 	return sb;
+}
+
+int     *count_files(char *dirs)
+{
+	DIR				*dp;
+	int				count;
+	static int		max[6];
+	struct dirent	*dirp;
+	struct stat		sb;
+
+	count = 0;
+	dp = opendir(dirs);
+	while ((dirp = readdir(dp)) != NULL)
+	{
+		max[0] = (ft_strlen(dirp->d_name) > max[0])
+			? ft_strlen(dirp->d_name) : max[0];
+		sb = get_stats(dirp->d_name, dirs);
+		max[1] = (ft_intlen(sb.st_nlink, 10) > max[1])
+			? ft_intlen(sb.st_nlink, 10) : max[1];
+		max[2] = (ft_strlen(getpwuid(sb.st_uid)->pw_name) > max[2])
+			? ft_strlen(getpwuid(sb.st_uid)->pw_name) : max[2];
+		max[3] = (ft_strlen(getgrgid(sb.st_gid)->gr_name) > max[3])
+			? ft_strlen(getgrgid(sb.st_gid)->gr_name) : max[3];
+		max[4] = (ft_intlen((int)sb.st_size, 10) > max[4])
+			? ft_intlen((int)sb.st_size, 10) : max[4];
+		count++;
+	}
+	max[5] = count;
+	closedir(dp);
+	return (max);
 }
 
 /*int cmp_time(const void* p1, const void* p2, char *dir)
@@ -156,6 +187,7 @@ void print_name_or_link(const char* filename, char *opts, mode_t mode)
 
 void display_stats(char* dir, char* filename, char *opts)
 {
+	int				*max;
 	struct stat     sb;
 
 	if (!is_in_dir(dir, filename))
@@ -167,19 +199,18 @@ void display_stats(char* dir, char* filename, char *opts)
 		return ;
 	}
 	sb = get_stats(filename, dir);
+	max = count_files(dir);
 	print_filetype(sb.st_mode);
 	print_permissions(sb.st_mode);
 	ft_putstr(" ");
-	ft_putstr(ft_itoa(sb.st_nlink));
-	ft_putstr(" ");
-	ft_putstr(getpwuid(sb.st_uid)->pw_name);
-	ft_putstr(" ");
-	ft_putstr(getgrgid(sb.st_gid)->gr_name);
-	ft_putstr(" ");
-	ft_putstr(ft_itoa((int)sb.st_size));
-	ft_putstr(" ");
+	ft_tabputstr(max[1] - ft_intlen(sb.st_nlink, 10), ft_itoa(sb.st_nlink), 0);
+	ft_tabputstr(0, getpwuid(sb.st_uid)->pw_name, 
+			max[2] - ft_strlen(getpwuid(sb.st_uid)->pw_name) + 1);
+	ft_tabputstr(0, getgrgid(sb.st_gid)->gr_name, 
+			max[3] - ft_strlen(getgrgid(sb.st_gid)->gr_name) + 1);
+	ft_tabputstr(max[4] - ft_intlen((int)sb.st_size, 10), 
+			ft_itoa((int)sb.st_size), 0);
 	print_time(sb.st_mtime);
-	ft_putstr(" ");
 	print_name_or_link(filename, opts, sb.st_mode);
 }
 
@@ -209,42 +240,6 @@ int		can_recurse_dir(char* parent, char* curr)
 		return (0);
 	}
 	return S_ISDIR(sb.st_mode);
-}
-
-int		count_files(char *dirs)
-{
-	DIR				*dp;
-	int				count;
-	static int		max[6];
-	struct dirent	*dirp;
-	struct stat     sb;
-
-	count = 0;
-	dp = opendir(dirs);
-	if ((dirp = readdir(dp)) == NULL)
-	{
-		perror("Error: ");
-		return (0);
-	}
-	while ((dirp = readdir(dp)) != NULL)
-	{
-		max[0] = (ft_strlen(dirp->d_name) > max[0]) 
-			? ft_strlen(dirp->d_name) : max[0];
-		ft_putendl(ft_itoa(max[0]));
-		sb = get_stats(dirp->d_name, dirs);
-		max[1] = (ft_intlen(sb.st_nlink, 10) > max[1]) 
-			? ft_intlen(sb.st_nlink, 10) : max[1];
-		max[2] = (ft_strlen(getpwuid(sb.st_uid)->pw_name) > max[2])
-			? ft_strlen(getpwuid(sb.st_uid)->pw_name) : max[2];
-		max[3] = (ft_strlen(getgrgid(sb.st_gid)->gr_name) > max[3])
-			? ft_strlen(getgrgid(sb.st_gid)->gr_name) : max[3];
-		max[4] = (ft_intlen((int)sb.st_size, 10) > max[4])
-			? ft_intlen((int)sb.st_size, 10) : max[4];
-		count++;
-	}
-	max[5] = count;
-	closedir(dp);
-	return (max[1]);
 }
 
 void	recurse_dirs(char *dir, char *opts, int check)
@@ -285,14 +280,16 @@ void	recurse_dirs(char *dir, char *opts, int check)
 
 void	print_dirs(DIR *dp, char *opts, char *dir_name)
 {
-	int             count;
+	char			**lstr;
+	char			*str;
+	int				*count;
 	struct dirent	*dirp;
 
-	count = 0;
 	ft_putstr("-------");
 	ft_putstr(opts);
 	ft_putstr("-------\n");
 	count = count_files(dir_name);
+	str = (char *)ft_memalloc(sizeof(char) * (count[5] * count[0]));
 	if ((dirp = readdir(dp)) == NULL)
 	{
 		perror("Error: ");
@@ -300,14 +297,14 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 	}
 	else
 	{
-		ft_putendl(ft_itoa(count));
+		ft_putendl(ft_itoa(count[5]));
 		while ((dirp = readdir(dp)) != NULL)
 		{
 			//if (!ft_strcmp(dirp->d_name, ".") || !ft_strcmp(dirp->d_name, ".."))
 			//(dirp->d_name[0] == ft_strchr(dirp->d_name, int c));
 			//if (ft_strcmp(dirp->d_name[0], ".") && ft_strcmp(opts, "a"))
-			if (ft_strcmp(dir_name,"exacalibur"))
-				count = 0;
+			//if (ft_strcmp(dir_name,"exacalibur"))
+			//	count = 0;
 			//if ((dirp->d_name[0] == 'x') && ft_strcmp(opts, "a"))
 			//	count++;
 			//else
@@ -315,24 +312,30 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 			//if(!ft_strcmp(dirp->d_name, "./"))
 			//	display_stats(dir_name, dirp->d_name, opts);
 			//printf("%s:\n", dir_name);
-			ft_putstr(dirp->d_name);
-			ft_putstr("\n");
+			//ft_putstr(dirp->d_name);
+			//ft_putstr("\n");
 			//display_stats(dir_name, dirp->d_name, opts);
 			//}
+			ft_strcat(str, dirp->d_name);
+			ft_strcat(str, ",");
 		}
+		*(str + ft_strlen(str) - 1) = '\0';
 	}
+	lstr = ft_strsplit(str, ',');
+	ft_putstrs(lstr, count[5]);
 	//recurse_dirs(".", opts, 0);
+	free(str);
 	closedir(dp);
 }
 
 void	print_error(int condition, char *info, char *infos)
 {
-	if(condition == 1)
+	if (condition == 1)
 	{
 		printf("ft_ls: illegal option -- %c\nusage: ft_ls [%s] [file ...]\n",
 				*info, infos);
 	}
-	if(condition == 2)
+	if (condition == 2)
 	{
 		printf("ft_ls: %s:  No such file or directory\n", info);
 	}
