@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/19 18:08:36 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/19 18:12:42 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -323,7 +323,7 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 		//*(str + ft_strlen(str) - 1) = '\0';
 	}
 	lstr = ft_strsplit(str, ',');
-	ft_revsortstr(lstr, count[5]);
+	ft_sortstr(lstr, count[5]);
 	ft_putstrs(lstr, count[5]);
 	//recurse_dirs(".", opts, 0);
 	free(str);
