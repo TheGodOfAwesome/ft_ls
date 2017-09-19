@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/13 18:55:50 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/19 18:08:36 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,6 +290,7 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 	ft_putstr("-------\n");
 	count = count_files(dir_name);
 	str = (char *)ft_memalloc(sizeof(char) * (count[5] * count[0]));
+	ft_strcat(str, ".,");
 	if ((dirp = readdir(dp)) == NULL)
 	{
 		perror("Error: ");
@@ -300,28 +301,29 @@ void	print_dirs(DIR *dp, char *opts, char *dir_name)
 		ft_putendl(ft_itoa(count[5]));
 		while ((dirp = readdir(dp)) != NULL)
 		{
-			//if (!ft_strcmp(dirp->d_name, ".") || !ft_strcmp(dirp->d_name, ".."))
-			//(dirp->d_name[0] == ft_strchr(dirp->d_name, int c));
-			//if (ft_strcmp(dirp->d_name[0], ".") && ft_strcmp(opts, "a"))
-			//if (ft_strcmp(dir_name,"exacalibur"))
-			//	count = 0;
-			//if ((dirp->d_name[0] == 'x') && ft_strcmp(opts, "a"))
-			//	count++;
-			//else
-			//{
-			//if(!ft_strcmp(dirp->d_name, "./"))
-			//	display_stats(dir_name, dirp->d_name, opts);
-			//printf("%s:\n", dir_name);
-			//ft_putstr(dirp->d_name);
-			//ft_putstr("\n");
-			//display_stats(dir_name, dirp->d_name, opts);
-			//}
+			/*if (!ft_strcmp(dirp->d_name, ".") || !ft_strcmp(dirp->d_name, ".."))
+			(dirp->d_name[0] == ft_strchr(dirp->d_name, int c));
+			if (ft_strcmp(dirp->d_name[0], ".") && ft_strcmp(opts, "a"))
+			if (ft_strcmp(dir_name,"exacalibur"))
+				count = 0;
+			if ((dirp->d_name[0] == 'x') && ft_strcmp(opts, "a"))
+				count++;
+			else
+			{
+				if(!ft_strcmp(dirp->d_name, "./"))
+					display_stats(dir_name, dirp->d_name, opts);
+				printf("%s:\n", dir_name);
+				ft_putstr(dirp->d_name);
+				ft_putstr("\n");
+				display_stats(dir_name, dirp->d_name, opts);
+			}*/
 			ft_strcat(str, dirp->d_name);
 			ft_strcat(str, ",");
 		}
-		*(str + ft_strlen(str) - 1) = '\0';
+		//*(str + ft_strlen(str) - 1) = '\0';
 	}
 	lstr = ft_strsplit(str, ',');
+	ft_revsortstr(lstr, count[5]);
 	ft_putstrs(lstr, count[5]);
 	//recurse_dirs(".", opts, 0);
 	free(str);

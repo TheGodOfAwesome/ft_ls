@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/05/10 10:53:29 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/13 18:13:20 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/19 18:07:59 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,5 +76,7 @@ int		ft_intlen(int num, int base);
 void	ft_swap(char *a, char *b);
 char	*ft_itoa(int n);
 void	ft_sortinttab(int *tab, int size);
+void	ft_sortstr(char **str, int max);
+void    ft_revsortstr(char **str, int max);
 
 #endif
