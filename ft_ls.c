@@ -6,14 +6,13 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/19 18:12:42 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/22 06:42:30 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <string.h>
 #include "ft_ls.h"
 
-void	print_permissions(mode_t mode)
+void		print_permissions(mode_t mode)
 {
 	ft_putchar((mode & S_IRUSR) ? 'r' : '-');
 	ft_putchar((mode & S_IWUSR) ? 'w' : '-');
@@ -26,7 +25,7 @@ void	print_permissions(mode_t mode)
 	ft_putchar((mode & S_IXOTH) ? 'x' : '-');
 }
 
-void	print_filetype(mode_t mode)
+void		print_filetype(mode_t mode)
 {
 	if (mode & S_IFREG) 
 		ft_putchar('-');
@@ -44,7 +43,7 @@ void	print_filetype(mode_t mode)
 		ft_putchar('f');
 }
 
-void	print_time(time_t mod_time)
+void		print_time(time_t mod_time)
 {
 	time_t curr_time;
 	time(&curr_time);
@@ -64,10 +63,10 @@ void	print_time(time_t mod_time)
 	ft_putchar(' ');
 }
 
-struct stat get_stats(const char *filename, char *dir)
+struct stat	get_stats(const char *filename, char *dir)
 {
-	char	*path;
-	struct stat sb;
+	char		*path;
+	struct stat	sb;
 
 	path = ft_strjoin(dir, "/");
 	path = ft_strjoin(path, filename);
@@ -79,15 +78,16 @@ struct stat get_stats(const char *filename, char *dir)
 	return sb;
 }
 
-int     *count_files(char *dirs)
+int			*count_files(char *dirs)
 {
 	DIR				*dp;
-	int				count;
-	static int		max[6];
+	int				cnt;
+	static int		max[7];
 	struct dirent	*dirp;
 	struct stat		sb;
 
-	count = 0;
+	cnt = 0;
+	max[5] = 0;
 	dp = opendir(dirs);
 	while ((dirp = readdir(dp)) != NULL)
 	{
@@ -102,24 +102,100 @@ int     *count_files(char *dirs)
 			? ft_strlen(getgrgid(sb.st_gid)->gr_name) : max[3];
 		max[4] = (ft_intlen((int)sb.st_size, 10) > max[4])
 			? ft_intlen((int)sb.st_size, 10) : max[4];
-		count++;
+		max[5] = ((int)sb.st_blocks > 0)
+			? (max[5] + (int)sb.st_blocks) : max[5];
+		cnt++;
 	}
-	max[5] = count;
+	max[6] = cnt;
 	closedir(dp);
 	return (max);
 }
 
-/*int cmp_time(const void* p1, const void* p2, char *dir)
-  {
-  const char* str1 = *(const char**)p1;
-  const char* str2 = *(const char**)p2;
+int			cmp_time(const void* p1, const void* p2, char *dir)
+{
+	char			*s1;
+	char			*s2;
+	int				ret;
+	time_t			time1;
+	time_t			time2;
+	struct stat		sb;
+	struct stat		nb;
 
-  time_t time1 = get_stats(str1, dir).st_mtime;
-  time_t time2 = get_stats(str2, dir).st_mtime;
-  return time1 < time2;
-  }*/
+	ret = 0;
+	s1 = (char *)p1;
+	s2 = (char *)p2;
+	sb = get_stats(s1, dir);
+	nb = get_stats(s2, dir);
+	time1 = sb.st_mtime;
+	time2 = nb.st_mtime;
+	if (time1 < time2)
+		ret = 1;
+	if (time1 > time2)
+		ret = -1;
+	if (time1 == time2)
+		ret = 0;
+	return (ret);
+}
 
-int     is_dir(const char* filename, char *dir)
+void		ft_timesortstr(char **str, int max, char *dir)
+{
+	int		i;
+	int		pairs_count;
+	char	*temp;
+
+	i = -1;
+	pairs_count = 1;
+	while (pairs_count)
+	{
+		pairs_count = 0;
+		i = 0;
+		while (i + 1 < max)
+		{
+			if (*(str + 1) != NULL)
+			{
+				if (cmp_time(&str[i][0], &str[i + 1][0], dir) == 1)
+				{
+					temp = str[i];
+					str[i] = str[i + 1];
+					str[i + 1] = temp;
+					pairs_count++;
+				}
+			}
+			i++;
+		}
+	}
+}
+
+void		ft_rtimesortstr(char **str, int max, char *dir)
+{
+	int		i;
+	int		pairs_count;
+	char	*temp;
+
+	i = -1;
+	pairs_count = 1;
+	while (pairs_count)
+	{
+		pairs_count = 0;
+		i = 0;
+		while (i + 1 < max)
+		{
+			if (*(str + 1) != NULL)
+			{
+				if (cmp_time(&str[i][0], &str[i + 1][0], dir) == -1)
+				{
+					temp = str[i];
+					str[i] = str[i + 1];
+					str[i + 1] = temp;
+					pairs_count++;
+				}
+			}
+			i++;
+		}
+	}
+}
+
+int			is_dir(const char* filename, char *dir)
 {
 	struct stat sb;
 
@@ -132,10 +208,10 @@ int     is_dir(const char* filename, char *dir)
 	return (sb.st_mode & S_IFDIR) ? 1 : 0;
 }
 
-int     is_in_dir(const char* dir, const char* filename)
+int			is_in_dir(const char* dir, const char* filename)
 {
-	DIR             *dfd;
-	struct dirent   *dp;
+	DIR				*dfd;
+	struct dirent	*dp;
 
 	dfd = opendir(dir);
 	if (!dfd)
@@ -160,11 +236,11 @@ int     is_in_dir(const char* dir, const char* filename)
 	return (0);
 }
 
-void print_name_or_link(const char* filename, char *opts, mode_t mode)
+void		print_name_or_link(const char* filename, char *opts, mode_t mode)
 {
 	char	*temp;
-	char    link_buf[512];
-	int     count;
+	char	link_buf[512];
+	int		count;
 
 	temp = opts;
 	if (mode & S_IFLNK)
@@ -185,10 +261,10 @@ void print_name_or_link(const char* filename, char *opts, mode_t mode)
 	ft_putstr("\n");
 }
 
-void display_stats(char* dir, char* filename, char *opts)
+void		display_stats(char *dir, char *filename, char *opts)
 {
 	int				*max;
-	struct stat     sb;
+	struct stat		sb;
 
 	if (!is_in_dir(dir, filename))
 		return ;
@@ -214,23 +290,64 @@ void display_stats(char* dir, char* filename, char *opts)
 	print_name_or_link(filename, opts, sb.st_mode);
 }
 
-void	check_flags(char *dir, char *opts, char *name)
+void		print_stats(char **av, int ac, char *opts, char *dir)
 {
-	if (ft_strcmp(opts, "l"))
+	int		i;
+
+	i = 0;
+	while (i < ac)
 	{
-		if (ft_strcmp(opts, "a"))
+		if (av[i])
 		{
-			display_stats(dir, name, opts);
+			display_stats(dir, av[i], opts);
 		}
+		i++;
 	}
 }
 
-int		can_recurse_dir(char* parent, char* curr)
+void		print_dirs(DIR *dp, char *opts, char *dir)
 {
-	static char *path;
-	struct stat sb;
+	char			**ls;
+	char			*str;
+	int				*cnt;
+	struct dirent	*dirp;
 
-	if (!ft_strcmp(".", curr) || !ft_strcmp("..", curr))	
+	ft_putstr(dir);
+	ft_putendl(":");
+	ft_putstr("-------");
+	ft_putstr(opts);
+	ft_putstr("-------\n");
+	cnt = count_files(dir);
+	str = "";
+	str = (char *)ft_memalloc(sizeof(char) * (cnt[5] * cnt[0]));
+	ft_strcat(str, ".,");
+	if ((dirp = readdir(dp)) != NULL)
+	{
+		ft_putstr("total ");
+		ft_putendl(ft_itoa(cnt[5]));
+		while ((dirp = readdir(dp)) != NULL)
+		{
+			ft_strcat(str, dirp->d_name);
+			ft_strcat(str, ",");
+		}
+	}
+	ls = ft_strsplit(str, ',');
+	(ft_strchr(opts, 'r')) ? ft_revsortstr(ls, cnt[6]) : ft_sortstr(ls, cnt[6]);
+	((ft_strchr(opts, 'r') && ft_strchr(opts, 't'))) 
+		? ft_rtimesortstr(ls, cnt[6], dir) : str;
+	(!ft_strchr(opts, 't')) ?: ft_timesortstr(ls, cnt[6], dir);
+	(ft_strchr(opts, 'l')) 
+		? print_stats(ls, cnt[6], opts, dir) : ft_putstrs(ls, cnt[6]);
+	free(str);
+	closedir(dp);
+}
+
+int			can_recurse_dir(char* parent, char* curr)
+{
+	static char		*path;
+	struct stat		sb;
+
+	if (!ft_strcmp(".", curr) || !ft_strcmp("..", curr))
 		return (0);
 	path = ft_strjoin(parent, "/");
 	path = ft_strjoin(path, curr);
@@ -242,32 +359,20 @@ int		can_recurse_dir(char* parent, char* curr)
 	return S_ISDIR(sb.st_mode);
 }
 
-void	recurse_dirs(char *dir, char *opts, int check)
+void		recurse_dirs(char *dir, char *opts, int check)
 {
 	char			*next;
 	DIR				*dfd;
 	struct dirent	*direntry;
-	int 			omit_hidden;
 
 	if (check)
-	{
-		//count_files(dir, opts, 1, 0);
-		check = 0;
-	}
+		ft_putstr("\n");
+	check++;
 	dfd = opendir(dir);
-	direntry = readdir(dfd);
-	ft_putstr("\n");
-	ft_putstr(dir);
-	ft_putstr("\n");
+	print_dirs(dfd, opts, dir);
+	dfd = opendir(dir);
 	while ((direntry = readdir(dfd)))
 	{
-		omit_hidden = !ft_strcmp(opts, "a");
-		if (!omit_hidden)
-		{
-			//ft_putstr(direntry->d_name);
-			display_stats(dir, direntry->d_name, opts);
-			//ft_putstr("\n");
-		}
 		if (can_recurse_dir(dir, direntry->d_name))
 		{
 			next = ft_strjoin(dir, "/");
@@ -278,59 +383,22 @@ void	recurse_dirs(char *dir, char *opts, int check)
 	closedir(dfd);
 }
 
-void	print_dirs(DIR *dp, char *opts, char *dir_name)
+void		check_flags(char *dir, char *opts)
 {
-	char			**lstr;
-	char			*str;
-	int				*count;
-	struct dirent	*dirp;
+	DIR		*dp;
 
-	ft_putstr("-------");
-	ft_putstr(opts);
-	ft_putstr("-------\n");
-	count = count_files(dir_name);
-	str = (char *)ft_memalloc(sizeof(char) * (count[5] * count[0]));
-	ft_strcat(str, ".,");
-	if ((dirp = readdir(dp)) == NULL)
+	if (ft_strchr(opts, 'R'))
 	{
-		perror("Error: ");
-		return ;
+		recurse_dirs(dir, opts, 0);
 	}
 	else
 	{
-		ft_putendl(ft_itoa(count[5]));
-		while ((dirp = readdir(dp)) != NULL)
-		{
-			/*if (!ft_strcmp(dirp->d_name, ".") || !ft_strcmp(dirp->d_name, ".."))
-			(dirp->d_name[0] == ft_strchr(dirp->d_name, int c));
-			if (ft_strcmp(dirp->d_name[0], ".") && ft_strcmp(opts, "a"))
-			if (ft_strcmp(dir_name,"exacalibur"))
-				count = 0;
-			if ((dirp->d_name[0] == 'x') && ft_strcmp(opts, "a"))
-				count++;
-			else
-			{
-				if(!ft_strcmp(dirp->d_name, "./"))
-					display_stats(dir_name, dirp->d_name, opts);
-				printf("%s:\n", dir_name);
-				ft_putstr(dirp->d_name);
-				ft_putstr("\n");
-				display_stats(dir_name, dirp->d_name, opts);
-			}*/
-			ft_strcat(str, dirp->d_name);
-			ft_strcat(str, ",");
-		}
-		//*(str + ft_strlen(str) - 1) = '\0';
+		dp = opendir(dir);
+		print_dirs(dp, opts, dir);
 	}
-	lstr = ft_strsplit(str, ',');
-	ft_sortstr(lstr, count[5]);
-	ft_putstrs(lstr, count[5]);
-	//recurse_dirs(".", opts, 0);
-	free(str);
-	closedir(dp);
 }
 
-void	print_error(int condition, char *info, char *infos)
+void		print_error(int condition, char *info, char *infos)
 {
 	if (condition == 1)
 	{
@@ -343,7 +411,7 @@ void	print_error(int condition, char *info, char *infos)
 	}
 }
 
-void    check_usage(char *dirs, char *opts)
+void		check_usage(char *dirs, char *opts)
 {
 	char			*flags;
 	char			*test;
@@ -353,7 +421,7 @@ void    check_usage(char *dirs, char *opts)
 	test = opts;
 	while (*test != '\0')
 	{
-		if(!ft_strchr(flags, *test) && *test != '-')
+		if (!ft_strchr(flags, *test) && *test != '-')
 		{
 			print_error(1, test, flags);
 			exit(0);
@@ -364,14 +432,11 @@ void    check_usage(char *dirs, char *opts)
 		print_error(2, dirs, "");
 	else
 	{
-		ft_putstr(dirs);
-		ft_putstr(":\n");
-		print_dirs(dp, opts, dirs);
+		check_flags(dirs, opts);
 	}
-	return ;
 }
 
-int		main(int ac, char **av)
+int			main(int ac, char **av)
 {
 	char	*opts;
 	int		i;
