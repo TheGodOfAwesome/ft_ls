@@ -6,17 +6,17 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/19 15:30:44 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/19 18:07:13 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/23 04:46:19 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void    ft_revsortstr(char **str, int max)
+void	ft_revsortstr(char **str, int max)
 {
-	int     i;
-	int     pairs_count;
-	char    *temp;
+	int		i;
+	int		pairs_count;
+	char	*temp;
 
 	i = -1;
 	pairs_count = 1;

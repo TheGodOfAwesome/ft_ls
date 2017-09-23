@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/22 06:42:30 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/23 06:03:26 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,30 +16,39 @@ void		print_permissions(mode_t mode)
 {
 	ft_putchar((mode & S_IRUSR) ? 'r' : '-');
 	ft_putchar((mode & S_IWUSR) ? 'w' : '-');
-	ft_putchar((mode & S_IXUSR) ? 'x' : '-');
+	if (mode & S_ISUID) 
+		ft_putchar('S');
+	else
+		ft_putchar((mode & S_IXUSR) ? 'x' : '-');
 	ft_putchar((mode & S_IRGRP) ? 'r' : '-');
 	ft_putchar((mode & S_IWGRP) ? 'w' : '-');
-	ft_putchar((mode & S_IXGRP) ? 'x' : '-');
+	if (mode & S_ISGID) 
+		ft_putchar('S');
+	else
+		ft_putchar((mode & S_IXGRP) ? 'x' : '-');
 	ft_putchar((mode & S_IROTH) ? 'r' : '-');
 	ft_putchar((mode & S_IWOTH) ? 'w' : '-');
-	ft_putchar((mode & S_IXOTH) ? 'x' : '-');
+	if (mode & S_ISVTX)
+		ft_putchar('T');
+	else
+		ft_putchar((mode & S_IXOTH) ? 'x' : '-');
 }
 
 void		print_filetype(mode_t mode)
 {
 	if (mode & S_IFREG) 
 		ft_putchar('-');
-	if (mode & S_IFDIR) 
+	else if (mode & S_IFDIR) 
 		ft_putchar('d');
-	if (mode & S_IFLNK)
+	else if (mode & S_IFLNK)
 		ft_putchar('l');
-	if (mode & S_IFCHR)
+	else if (mode & S_IFCHR)
 		ft_putchar('c');
-	if (mode & S_IFBLK)
+	else if (mode & S_IFBLK)
 		ft_putchar('b');
-	if (mode & S_IFSOCK)
+	else if (mode & S_IFSOCK)
 		ft_putchar('s');
-	if (mode & S_IFIFO)
+	else if (mode & S_IFIFO)
 		ft_putchar('f');
 }
 
@@ -75,13 +84,15 @@ struct stat	get_stats(const char *filename, char *dir)
 		perror(path);
 		exit(0);
 	}
+	free(path);
 	return sb;
 }
 
-int			*count_files(char *dirs)
+int			*count_files(char *dirs, char *opts)
 {
 	DIR				*dp;
 	int				cnt;
+	int				omit_hidden;
 	static int		max[7];
 	struct dirent	*dirp;
 	struct stat		sb;
@@ -91,20 +102,24 @@ int			*count_files(char *dirs)
 	dp = opendir(dirs);
 	while ((dirp = readdir(dp)) != NULL)
 	{
-		max[0] = (ft_strlen(dirp->d_name) > max[0])
-			? ft_strlen(dirp->d_name) : max[0];
-		sb = get_stats(dirp->d_name, dirs);
-		max[1] = (ft_intlen(sb.st_nlink, 10) > max[1])
-			? ft_intlen(sb.st_nlink, 10) : max[1];
-		max[2] = (ft_strlen(getpwuid(sb.st_uid)->pw_name) > max[2])
-			? ft_strlen(getpwuid(sb.st_uid)->pw_name) : max[2];
-		max[3] = (ft_strlen(getgrgid(sb.st_gid)->gr_name) > max[3])
-			? ft_strlen(getgrgid(sb.st_gid)->gr_name) : max[3];
-		max[4] = (ft_intlen((int)sb.st_size, 10) > max[4])
-			? ft_intlen((int)sb.st_size, 10) : max[4];
-		max[5] = ((int)sb.st_blocks > 0)
-			? (max[5] + (int)sb.st_blocks) : max[5];
-		cnt++;
+		omit_hidden = !ft_strchr(opts, 'a') && dirp->d_name[0] == '.';
+		if (!omit_hidden)
+		{
+			max[0] = (ft_strlen(dirp->d_name) > max[0])
+				? ft_strlen(dirp->d_name) : max[0];
+			sb = get_stats(dirp->d_name, dirs);
+			max[1] = (ft_intlen(sb.st_nlink, 10) > max[1])
+				? ft_intlen(sb.st_nlink, 10) : max[1];
+			max[2] = (ft_strlen(getpwuid(sb.st_uid)->pw_name) > max[2])
+				? ft_strlen(getpwuid(sb.st_uid)->pw_name) : max[2];
+			max[3] = (ft_strlen(getgrgid(sb.st_gid)->gr_name) > max[3])
+				? ft_strlen(getgrgid(sb.st_gid)->gr_name) : max[3];
+			max[4] = (ft_intlen((int)sb.st_size, 10) > max[4])
+				? ft_intlen((int)sb.st_size, 10) : max[4];
+			max[5] = ((int)sb.st_blocks > 0)
+				? (max[5] + (int)sb.st_blocks) : max[5];
+			cnt++;
+		}
 	}
 	max[6] = cnt;
 	closedir(dp);
@@ -275,7 +290,7 @@ void		display_stats(char *dir, char *filename, char *opts)
 		return ;
 	}
 	sb = get_stats(filename, dir);
-	max = count_files(dir);
+	max = count_files(dir, opts);
 	print_filetype(sb.st_mode);
 	print_permissions(sb.st_mode);
 	ft_putstr(" ");
@@ -310,32 +325,38 @@ void		print_dirs(DIR *dp, char *opts, char *dir)
 	char			**ls;
 	char			*str;
 	int				*cnt;
+	int				omit_hidden;
 	struct dirent	*dirp;
 
 	ft_putstr(dir);
 	ft_putendl(":");
-	ft_putstr("-------");
-	ft_putstr(opts);
-	ft_putstr("-------\n");
-	cnt = count_files(dir);
+	cnt = count_files(dir, opts);
 	str = "";
 	str = (char *)ft_memalloc(sizeof(char) * (cnt[5] * cnt[0]));
-	ft_strcat(str, ".,");
+	if (ft_strchr(opts, 'a'))
+		ft_strcat(str, ".,");
 	if ((dirp = readdir(dp)) != NULL)
 	{
-		ft_putstr("total ");
-		ft_putendl(ft_itoa(cnt[5]));
+		if (ft_strchr(opts, 'l'))
+		{
+			ft_putstr("total ");
+			ft_putendl(ft_itoa(cnt[5]));
+		}
 		while ((dirp = readdir(dp)) != NULL)
 		{
-			ft_strcat(str, dirp->d_name);
-			ft_strcat(str, ",");
+			omit_hidden = !ft_strchr(opts, 'a') && dirp->d_name[0] == '.';
+			if (!omit_hidden)
+			{
+				ft_strcat(str, dirp->d_name);
+				ft_strcat(str, ",");
+			}
 		}
 	}
 	ls = ft_strsplit(str, ',');
 	(ft_strchr(opts, 'r')) ? ft_revsortstr(ls, cnt[6]) : ft_sortstr(ls, cnt[6]);
 	((ft_strchr(opts, 'r') && ft_strchr(opts, 't'))) 
 		? ft_rtimesortstr(ls, cnt[6], dir) : str;
-	(!ft_strchr(opts, 't')) ?: ft_timesortstr(ls, cnt[6], dir);
+	(!ft_strchr(opts, 't')) ? : ft_timesortstr(ls, cnt[6], dir);
 	(ft_strchr(opts, 'l')) 
 		? print_stats(ls, cnt[6], opts, dir) : ft_putstrs(ls, cnt[6]);
 	free(str);
@@ -402,12 +423,17 @@ void		print_error(int condition, char *info, char *infos)
 {
 	if (condition == 1)
 	{
-		printf("ft_ls: illegal option -- %c\nusage: ft_ls [%s] [file ...]\n",
-				*info, infos);
+		ft_putstr("ft_ls: illegal option -- ");
+		ft_putchar(*info);
+		ft_putstr("\nusage: ft_ls [");
+		ft_putstr(infos);
+		ft_putstr("] [file ...]\n");
 	}
 	if (condition == 2)
 	{
-		printf("ft_ls: %s:  No such file or directory\n", info);
+		ft_putstr("ft_ls: ");
+		ft_putstr(info);
+		ft_putstr(":  No such file or directory\n");
 	}
 }
 
@@ -416,8 +442,9 @@ void		check_usage(char *dirs, char *opts)
 	char			*flags;
 	char			*test;
 	DIR				*dp;
+	struct dirent	*dirp;
 
-	flags = "ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1";
+	flags = "-ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1";
 	test = opts;
 	while (*test != '\0')
 	{
@@ -429,11 +456,21 @@ void		check_usage(char *dirs, char *opts)
 		test++;
 	}
 	if ((dp = opendir(dirs)) == NULL)
-		print_error(2, dirs, "");
-	else
 	{
-		check_flags(dirs, opts);
+		dp = opendir(".");
+		while ((dirp = readdir(dp)) != NULL)
+		{
+			if(ft_strstr(dirp->d_name, dirs) != NULL)
+			{
+				(ft_strchr(opts, 'l')) 
+				? display_stats(".", dirs, opts) : ft_putendl(dirs);
+				return ;
+			}
+		}
+		print_error(2, dirs, "");
 	}
+	else
+		check_flags(dirs, opts);
 }
 
 int			main(int ac, char **av)
