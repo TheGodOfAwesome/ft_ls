@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/23 06:03:26 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/24 05:52:03 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,8 +102,7 @@ int			*count_files(char *dirs, char *opts)
 	dp = opendir(dirs);
 	while ((dirp = readdir(dp)) != NULL)
 	{
-		omit_hidden = !ft_strchr(opts, 'a') && dirp->d_name[0] == '.';
-		if (!omit_hidden)
+		if (!(omit_hidden = !ft_strchr(opts, 'a') && dirp->d_name[0] == '.'))
 		{
 			max[0] = (ft_strlen(dirp->d_name) > max[0])
 				? ft_strlen(dirp->d_name) : max[0];
@@ -344,8 +343,7 @@ void		print_dirs(DIR *dp, char *opts, char *dir)
 		}
 		while ((dirp = readdir(dp)) != NULL)
 		{
-			omit_hidden = !ft_strchr(opts, 'a') && dirp->d_name[0] == '.';
-			if (!omit_hidden)
+			if(!(omit_hidden = !ft_strchr(opts, 'a') && dirp->d_name[0] == '.'))
 			{
 				ft_strcat(str, dirp->d_name);
 				ft_strcat(str, ",");
