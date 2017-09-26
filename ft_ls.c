@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/24 05:52:03 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/26 12:25:36 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ int			*count_files(char *dirs, char *opts)
 {
 	DIR				*dp;
 	int				cnt;
-	int				omit_hidden;
+	//int				omit_hidden;
 	static int		max[7];
 	struct dirent	*dirp;
 	struct stat		sb;
@@ -102,7 +102,7 @@ int			*count_files(char *dirs, char *opts)
 	dp = opendir(dirs);
 	while ((dirp = readdir(dp)) != NULL)
 	{
-		if (!(omit_hidden = !ft_strchr(opts, 'a') && dirp->d_name[0] == '.'))
+		if (!(!ft_strchr(opts, 'a') && dirp->d_name[0] == '.'))
 		{
 			max[0] = (ft_strlen(dirp->d_name) > max[0])
 				? ft_strlen(dirp->d_name) : max[0];
@@ -375,7 +375,7 @@ int			can_recurse_dir(char* parent, char* curr)
 		perror(path);
 		return (0);
 	}
-	return S_ISDIR(sb.st_mode);
+	return (S_ISDIR(sb.st_mode));
 }
 
 void		recurse_dirs(char *dir, char *opts, int check)
@@ -394,9 +394,12 @@ void		recurse_dirs(char *dir, char *opts, int check)
 	{
 		if (can_recurse_dir(dir, direntry->d_name))
 		{
-			next = ft_strjoin(dir, "/");
-			next = ft_strjoin(next, direntry->d_name);
-			recurse_dirs(next, opts, check);
+			if (!(ft_strchr(opts, 'a') && direntry->d_name[0] == '.'))
+			{
+				next = ft_strjoin(dir, "/");
+				next = ft_strjoin(next, direntry->d_name);
+				recurse_dirs(next, opts, check);
+			}
 		}
 	}
 	closedir(dfd);
