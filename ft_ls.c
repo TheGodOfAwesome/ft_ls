@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/26 18:18:52 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/27 14:50:56 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void		check_usage(char *dirs, char *opts)
 	DIR				*dp;
 	struct dirent	*dirp;
 
-	flags = "-Ralrt";
+	flags = "-Ralrt1";
 	test = opts;
 	while (*test != '\0')
 	{
