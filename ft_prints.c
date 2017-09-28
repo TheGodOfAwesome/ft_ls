@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/26 16:31:43 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/26 17:04:02 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/28 14:24:05 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,11 @@ void		print_dirs(DIR *dp, char *opts, char *dir)
 	char			*str;
 	int				*cnt;
 
-	ft_putstr(dir);
-	ft_putendl(":");
+	if (ft_strchr(opts, 'R'))
+	{
+		ft_putstr(dir);
+		ft_putendl(":");
+	}
 	cnt = count_files(dir, opts);
 	str = "";
 	str = (char *)ft_memalloc(sizeof(char) * (cnt[5] * cnt[0]));

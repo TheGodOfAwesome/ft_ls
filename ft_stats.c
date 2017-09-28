@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/26 13:20:42 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/27 17:11:09 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/09/28 15:39:15 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,19 +36,19 @@ void		print_permissions(mode_t mode)
 
 void		print_filetype(mode_t mode)
 {
-	if (mode & S_IFLNK)
+	if ((mode & S_IFMT) == S_IFLNK)
 		ft_putchar('l');
-	else if (mode & S_IFDIR)
+	else if ((mode & S_IFMT) == S_IFDIR)
 		ft_putchar('d');
-	else if (mode & S_IFCHR)
+	else if ((mode & S_IFMT) == S_IFCHR)
 		ft_putchar('c');
-	else if (mode & S_IFBLK)
+	else if ((mode & S_IFMT) == S_IFBLK)
 		ft_putchar('b');
-	else if (mode & S_IFSOCK)
+	else if ((mode & S_IFMT) == S_IFSOCK)
 		ft_putchar('s');
-	else if (mode & S_IFIFO)
+	else if ((mode & S_IFMT) == S_IFIFO)
 		ft_putchar('f');
-	else if (mode & S_IFREG)
+	else if ((mode & S_IFMT) == S_IFREG)
 		ft_putchar('-');
 }
 
