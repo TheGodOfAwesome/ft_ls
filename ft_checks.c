@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/26 15:26:19 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/26 15:43:19 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/10/01 01:43:17 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void		ft_rtimesortstr(char **str, int max, char *dir)
 	}
 }
 
-int			is_dir(const char* filename, char *dir)
+int			is_dir(const char *filename, char *dir)
 {
 	struct stat sb;
 
@@ -83,7 +83,7 @@ int			is_dir(const char* filename, char *dir)
 	return (sb.st_mode & S_IFDIR) ? 1 : 0;
 }
 
-int			is_in_dir(const char* dir, const char* filename)
+int			is_in_dir(const char *dir, const char *filename)
 {
 	DIR				*dfd;
 	struct dirent	*dp;
@@ -111,18 +111,19 @@ int			is_in_dir(const char* dir, const char* filename)
 	return (0);
 }
 
-int			can_recurse_dir(char* parent, char* curr)
+int			can_recurse_dir(char *parent, char *curr)
 {
-	static char     *path;
-	struct stat     sb;
+	static char		*path;
+	static char		*path2;
+	struct stat		sb;
 
 	if (!ft_strcmp(".", curr) || !ft_strcmp("..", curr))
 		return (0);
 	path = ft_strjoin(parent, "/");
-	path = ft_strjoin(path, curr);
-	if (lstat(path, &sb) < 0)
+	path2 = ft_strjoin(path, curr);
+	if (lstat(path2, &sb) < 0)
 	{
-		perror(path);
+		perror(path2);
 		return (0);
 	}
 	return (S_ISDIR(sb.st_mode));

@@ -6,46 +6,47 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/08 15:28:25 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/27 14:50:56 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/10/01 01:46:30 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
+int			set_max(int cur, int max)
+{
+	int		ret;
+
+	ret = 0;
+	ret = (cur > max) ? cur : max;
+	return (ret);
+}
+
 int			*count_files(char *dirs, char *opts)
 {
 	DIR				*dp;
 	int				cnt;
-	static int		max[7];
+	static int		mx[7];
 	struct dirent	*dirp;
 	struct stat		sb;
 
 	cnt = 0;
-	max[5] = 0;
+	mx[5] = 0;
 	dp = opendir(dirs);
 	while ((dirp = readdir(dp)) != NULL)
-	{
 		if (!(!ft_strchr(opts, 'a') && dirp->d_name[0] == '.'))
 		{
-			max[0] = (ft_strlen(dirp->d_name) > max[0])
-				? ft_strlen(dirp->d_name) : max[0];
 			sb = get_stats(dirp->d_name, dirs);
-			max[1] = (ft_intlen(sb.st_nlink, 10) > max[1])
-				? ft_intlen(sb.st_nlink, 10) : max[1];
-			max[2] = (ft_strlen(getpwuid(sb.st_uid)->pw_name) > max[2])
-				? ft_strlen(getpwuid(sb.st_uid)->pw_name) : max[2];
-			max[3] = (ft_strlen(getgrgid(sb.st_gid)->gr_name) > max[3])
-				? ft_strlen(getgrgid(sb.st_gid)->gr_name) : max[3];
-			max[4] = (ft_intlen((int)sb.st_size, 10) > max[4])
-				? ft_intlen((int)sb.st_size, 10) : max[4];
-			max[5] = ((int)sb.st_blocks > 0)
-				? (max[5] + (int)sb.st_blocks) : max[5];
+			mx[0] = set_max(ft_strlen(dirp->d_name), mx[0]);
+			mx[1] = set_max(ft_intlen(sb.st_nlink, 10), mx[1]);
+			mx[2] = set_max(ft_strlen(getpwuid(sb.st_uid)->pw_name), mx[2]);
+			mx[3] = set_max(ft_strlen(getgrgid(sb.st_gid)->gr_name), mx[3]);
+			mx[4] = set_max(ft_intlen((int)sb.st_size, 10), mx[4]);
+			mx[5] = ((int)sb.st_blocks) ? (mx[5] + (int)sb.st_blocks) : mx[5];
 			cnt++;
 		}
-	}
-	max[6] = cnt;
+	mx[6] = cnt;
 	closedir(dp);
-	return (max);
+	return (mx);
 }
 
 void		check_flags(char *dir, char *opts)
@@ -68,9 +69,8 @@ void		check_usage(char *dirs, char *opts)
 	char			*flags;
 	char			*test;
 	DIR				*dp;
-	struct dirent	*dirp;
 
-	flags = "-Ralrt1";
+	flags = "-ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1";
 	test = opts;
 	while (*test != '\0')
 	{
@@ -82,21 +82,10 @@ void		check_usage(char *dirs, char *opts)
 		test++;
 	}
 	if ((dp = opendir(dirs)) == NULL)
-	{
-		dp = opendir(".");
-		while ((dirp = readdir(dp)) != NULL)
-		{
-			if (ft_strstr(dirp->d_name, dirs) != NULL)
-			{
-				(ft_strchr(opts, 'l'))
-					? display_stats(".", dirs, opts) : ft_putendl(dirs);
-				return ;
-			}
-		}
-		print_error(2, dirs, "");
-	}
+		print_one(dirs, opts);
 	else
 		check_flags(dirs, opts);
+	return ;
 }
 
 int			main(int ac, char **av)

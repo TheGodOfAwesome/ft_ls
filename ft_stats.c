@@ -6,7 +6,7 @@
 /*   By: kmuvezwa <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/09/26 13:20:42 by kmuvezwa          #+#    #+#             */
-/*   Updated: 2017/09/28 15:39:15 by kmuvezwa         ###   ########.fr       */
+/*   Updated: 2017/10/01 01:42:52 by kmuvezwa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void		print_permissions(mode_t mode)
 		ft_putchar('T');
 	else
 		ft_putchar((mode & S_IXOTH) ? 'x' : '-');
+	ft_putchar(' ');
 }
 
 void		print_filetype(mode_t mode)
@@ -54,44 +55,28 @@ void		print_filetype(mode_t mode)
 
 void		print_time(time_t mod_time)
 {
-	time_t curr_time;
-	time(&curr_time);
-	struct tm* t = localtime(&curr_time);
-	const int curr_mon = t->tm_mon;
-	const int curr_yr = 1970 + t->tm_year;
-	t = localtime(&mod_time);
-	const int mod_mon = t->tm_mon;
-	const int mod_yr = 1970 + t->tm_year;
-	const char* format = ((mod_yr == curr_yr)
-			&& (mod_mon >= (curr_mon - 6)))
-		? "%b %e %H:%M"
-		: "%b %e  %Y";
-	char time_buf[128];
-	strftime(time_buf, sizeof(time_buf), format, t);
-	ft_putstr(time_buf);
+	ft_putstr(ft_strsub(ctime(&mod_time), 4, 12));
 	ft_putchar(' ');
 }
 
 struct stat	get_stats(const char *filename, char *dir)
 {
 	char		*path;
+	char		*path2;
 	struct stat	sb;
 
 	path = ft_strjoin(dir, "/");
-	path = ft_strjoin(path, filename);
-	if (lstat(path, &sb) < 0)
+	path2 = ft_strjoin(path, filename);
+	if (lstat(path2, &sb) < 0)
 	{
-		perror(path);
+		perror(path2);
 		exit(0);
 	}
-	free(path);
-	return sb;
+	return (sb);
 }
 
 int			cmp_time(const void *p1, const void *p2, char *dir)
 {
-	char			*s1;
-	char			*s2;
 	int				ret;
 	time_t			time1;
 	time_t			time2;
@@ -99,10 +84,8 @@ int			cmp_time(const void *p1, const void *p2, char *dir)
 	struct stat		nb;
 
 	ret = 0;
-	s1 = (char *)p1;
-	s2 = (char *)p2;
-	sb = get_stats(s1, dir);
-	nb = get_stats(s2, dir);
+	sb = get_stats((char *)p1, dir);
+	nb = get_stats((char *)p2, dir);
 	time1 = sb.st_mtime;
 	time2 = nb.st_mtime;
 	if (time1 < time2)
